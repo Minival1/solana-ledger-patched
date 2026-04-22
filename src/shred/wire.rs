@@ -85,7 +85,7 @@ pub(crate) const fn get_signature_range() -> Range<usize> {
 }
 
 #[inline]
-pub(super) fn get_shred_variant(shred: &[u8]) -> Result<ShredVariant, Error> {
+pub fn get_shred_variant(shred: &[u8]) -> Result<ShredVariant, Error> {
     let Some(&shred_variant) = shred.get(64) else {
         return Err(Error::InvalidPayloadSize(shred.len()));
     };
@@ -151,7 +151,7 @@ fn get_data_size(shred: &[u8]) -> Result<u16, Error> {
 }
 
 #[inline]
-pub(crate) fn get_data(shred: &[u8]) -> Result<&[u8], Error> {
+pub fn get_data(shred: &[u8]) -> Result<&[u8], Error> {
     match get_shred_variant(shred)? {
         ShredVariant::LegacyCode => Err(Error::InvalidShredType),
         ShredVariant::MerkleCode { .. } => Err(Error::InvalidShredType),

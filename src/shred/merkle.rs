@@ -137,6 +137,17 @@ impl Shred {
             ShredVariant::MerkleData { .. } => Ok(Self::ShredData(ShredData::from_payload(shred)?)),
         }
     }
+
+    // Exposed for external shred decoders that pattern-match on
+    // `merkle::Shred`. Upstream v2.3.1 had these private; jito's v2.2
+    // merkle-recovery branch had them `pub` - mirror the latter.
+    pub fn index(&self) -> u32 {
+        self.common_header().index
+    }
+
+    pub fn shred_type(&self) -> ShredType {
+        ShredType::from(self.common_header().shred_variant)
+    }
 }
 
 #[cfg(test)]
@@ -147,14 +158,6 @@ impl Shred {
     dispatch!(pub(super) fn merkle_root(&self) -> Result<Hash, Error>);
     dispatch!(pub(super) fn retransmitter_signature(&self) -> Result<Signature, Error>);
     dispatch!(pub(super) fn retransmitter_signature_offset(&self) -> Result<usize, Error>);
-
-    pub fn index(&self) -> u32 {
-        self.common_header().index
-    }
-
-    pub fn shred_type(&self) -> ShredType {
-        ShredType::from(self.common_header().shred_variant)
-    }
 }
 
 impl ShredData {

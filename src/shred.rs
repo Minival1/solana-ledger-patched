@@ -145,7 +145,7 @@ pub const LEGACY_SHRED_DATA_CAPACITY: usize = legacy::ShredData::CAPACITY;
 // LAST_SHRED_IN_SLOT also implies DATA_COMPLETE_SHRED.
 // So it cannot be LAST_SHRED_IN_SLOT if not also DATA_COMPLETE_SHRED.
 bitflags! {
-    #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, Serialize, Deserialize)]
     pub struct ShredFlags:u8 {
         const SHRED_TICK_REFERENCE_MASK = 0b0011_1111;
         const DATA_COMPLETE_SHRED       = 0b0100_0000;
@@ -221,7 +221,7 @@ pub enum ShredType {
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 #[serde(into = "u8", try_from = "u8")]
-enum ShredVariant {
+pub enum ShredVariant {
     LegacyCode, // 0b0101_1010
     LegacyData, // 0b1010_0101
     // proof_size is the number of Merkle proof entries, and is encoded in the
@@ -246,30 +246,30 @@ enum ShredVariant {
 }
 
 /// A common header that is present in data and code shred headers
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
-struct ShredCommonHeader {
-    signature: Signature,
-    shred_variant: ShredVariant,
-    slot: Slot,
-    index: u32,
-    version: u16,
-    fec_set_index: u32,
+#[derive(Hash, Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct ShredCommonHeader {
+    pub signature: Signature,
+    pub shred_variant: ShredVariant,
+    pub slot: Slot,
+    pub index: u32,
+    pub version: u16,
+    pub fec_set_index: u32,
 }
 
 /// The data shred header has parent offset and flags
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
-struct DataShredHeader {
-    parent_offset: u16,
-    flags: ShredFlags,
-    size: u16, // common shred header + data shred header + data
+#[derive(Hash, Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct DataShredHeader {
+    pub parent_offset: u16,
+    pub flags: ShredFlags,
+    pub size: u16, // common shred header + data shred header + data
 }
 
 /// The coding shred header has FEC information
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
-struct CodingShredHeader {
-    num_data_shreds: u16,
-    num_coding_shreds: u16,
-    position: u16, // [0..num_coding_shreds)
+#[derive(Hash, Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct CodingShredHeader {
+    pub num_data_shreds: u16,
+    pub num_coding_shreds: u16,
+    pub position: u16, // [0..num_coding_shreds)
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
